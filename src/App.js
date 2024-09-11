@@ -1,12 +1,11 @@
-import React from 'react';
-import ArtistSearch from './components/ArtistSearch';
+import "bootstrap/dist/css/bootstrap.min.css"
+import Login from "./Login"
+import Dashboard from "./Dashboard"
+
+const code = new URLSearchParams(window.location.search).get("code")
 
 function App() {
-  return (
-    <div className="App">
-      <ArtistSearch />
-    </div>
-  );
+  return code ? <Dashboard code={code} /> : <Login />
 }
 
-export default App;
+export default App
