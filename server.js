@@ -58,21 +58,17 @@ app.post("/login", (req, res) => {
 // Modify the lyrics endpoint to use Genius API
 app.get("/lyrics", async (req, res) => {
   const { artist, track } = req.query;
-  
-  console.log("Received request for lyrics with the following data:");
-  console.log("Artist:", artist);
-  console.log("Track:", track);
+  console.log("Received request for lyrics:", track, artist);
 
   const options = {
-    apiKey: process.env.GENIUS_API_KEY, // Genius API key from .env
+    apiKey: process.env.GENIUS_API_KEY,
     title: track,
     artist: artist,
-    optimizeQuery: true
+    optimizeQuery: true,
   };
 
   try {
-    const lyrics = await Genius.getLyrics(options); // Fetch lyrics from Genius API
-
+    const lyrics = await Genius.getLyrics(options);
     if (!lyrics) {
       console.log("No Lyrics Found");
       res.json({ lyrics: "No Lyrics Found" });
@@ -81,10 +77,11 @@ app.get("/lyrics", async (req, res) => {
       res.json({ lyrics });
     }
   } catch (error) {
-    console.error("Error fetching lyrics:", error);
+    console.error("Error fetching lyrics:", error.message); // Log full error details
     res.status(500).json({ lyrics: "Error fetching lyrics" });
   }
 });
+
 
 app.listen(3001, () => {
   console.log("Server is running on port 3001");

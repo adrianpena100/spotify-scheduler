@@ -1,34 +1,67 @@
-import { useState, useEffect } from "react"
-import useAuth from "./useAuth"
-import Player from "./Player"
-import TrackSearchResult from "./TrackSearchResult"
-import { Container, Form } from "react-bootstrap"
-import SpotifyWebApi from "spotify-web-api-node"
-import axios from "axios"
+import { useState, useEffect, useCallback } from "react";  // Add useCallback import
+import useAuth from "./useAuth";
+import Player from "./Player";
+import TrackSearchResult from "./TrackSearchResult";
+import { Container, Form } from "react-bootstrap";
+import SpotifyWebApi from "spotify-web-api-node";
+import axios from "axios";
+import CreatePlaylist from './CreatePlaylist';
+import DisplayPlaylists from './DisplayPlaylists';
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "69fd466f76c84dc9b965ac235c3c97b7",
-})
+});
 
 export default function Dashboard({ code }) {
-  const accessToken = useAuth(code)
-  const [search, setSearch] = useState("")
-  const [searchResults, setSearchResults] = useState([])
-  const [playingTrack, setPlayingTrack] = useState()
-  const [lyrics, setLyrics] = useState("")
+  const accessToken = useAuth(code);
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [playingTrack, setPlayingTrack] = useState();
+  const [lyrics, setLyrics] = useState("");
+  const [partyPlaylists, setPartyPlaylists] = useState([]);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+  const [tracks, setTracks] = useState([]);
 
   function chooseTrack(track) {
-    setPlayingTrack(track)
-    setSearch("")
-    setLyrics("")
+    setPlayingTrack(track);
+    setSearch("");
+    setLyrics("");
   }
 
-  // Effect to get the lyrics for the currently playing track
+  // Wrap refreshPlaylists with useCallback to prevent unnecessary re-renders
+  const refreshPlaylists = useCallback(() => {
+    if (!accessToken) return;
+    spotifyApi.getUserPlaylists()
+      .then(data => {
+        const playlists = data.body.items;
+        const filteredPlaylists = playlists.filter(playlist => playlist.name.endsWith(" - PARTY"));
+        setPartyPlaylists(filteredPlaylists);
+      })
+      .catch(err => {
+        console.error('Something went wrong!', err);
+      });
+  }, [accessToken]);
+
+  const refreshTracks = (playlistId) => {
+    if (!playlistId) return;
+    spotifyApi.getPlaylistTracks(playlistId)
+      .then(res => {
+        setTracks(res.body.items);
+      })
+      .catch(err => {
+        console.error('Error fetching playlist tracks:', err);
+      });
+  };
+
   useEffect(() => {
-    if (!playingTrack) return
+    if (!accessToken) return;
+    spotifyApi.setAccessToken(accessToken);
+    refreshPlaylists();  // This now won't cause a warning
+  }, [accessToken, refreshPlaylists]);
 
-    console.log("Fetching lyrics for track:", playingTrack.title, playingTrack.artist);
-
+  // Effect to fetch lyrics for the currently playing track
+  useEffect(() => {
+    if (!playingTrack) return;
     axios
       .get("http://localhost:3001/lyrics", {
         params: {
@@ -37,70 +70,78 @@ export default function Dashboard({ code }) {
         },
       })
       .then(res => {
-        console.log("Lyrics fetched successfully:", res.data.lyrics)
-        setLyrics(res.data.lyrics || "No Lyrics Found")
+        setLyrics(res.data.lyrics || "No Lyrics Found");
       })
       .catch(err => {
-        console.error("Error fetching lyrics:", err)
-        setLyrics("Error fetching lyrics")
-      })
-  }, [playingTrack])
+        setLyrics("Error fetching lyrics");
+      });
+  }, [playingTrack]);
 
-  // Effect to set the access token for Spotify API
+  // Effect to search for tracks
   useEffect(() => {
-    if (!accessToken) return
-    spotifyApi.setAccessToken(accessToken)
-  }, [accessToken])
+    if (!search) return setSearchResults([]);
+    if (!accessToken) return;
 
-  // Effect to search tracks based on user input
-  useEffect(() => {
-    if (!search) return setSearchResults([])
-    if (!accessToken) return
-
-    let cancel = false
-    console.log("Searching for:", search)
-
+    let cancel = false;
     spotifyApi.searchTracks(search).then(res => {
-      if (cancel) return
+      if (cancel) return;
       setSearchResults(
         res.body.tracks.items.map(track => {
           const smallestAlbumImage = track.album.images.reduce(
             (smallest, image) => {
-              if (image.height < smallest.height) return image
-              return smallest
+              if (image.height < smallest.height) return image;
+              return smallest;
             },
             track.album.images[0]
-          )
+          );
 
           return {
             artist: track.artists[0].name,
             title: track.name,
             uri: track.uri,
             albumUrl: smallestAlbumImage.url,
-          }
+          };
         })
-      )
-    }).catch(err => {
-      console.error("Error searching tracks:", err)
-    })
+      );
+    });
 
-    return () => (cancel = true)
-  }, [search, accessToken])
+    return () => (cancel = true);
+  }, [search, accessToken]);
 
   return (
-    <Container className="d-flex flex-column py-2" style={{ height: "100vh" }}>
+    <Container className="d-flex flex-column py-2" style={{ height: "100vh", overflowY: "auto" }}>
+      <CreatePlaylist spotifyApi={spotifyApi} refreshPlaylists={refreshPlaylists} />
+
+      <DisplayPlaylists
+        partyPlaylists={partyPlaylists}
+        spotifyApi={spotifyApi}
+        accessToken={accessToken}
+        onTrackSelect={chooseTrack}
+        selectedPlaylistId={selectedPlaylistId}
+        setSelectedPlaylistId={setSelectedPlaylistId}
+        refreshTracks={refreshTracks}
+        tracks={tracks}
+      />
+
       <Form.Control
         type="search"
         placeholder="Search Songs/Artists"
         value={search}
         onChange={e => setSearch(e.target.value)}
+        className="mt-3"
       />
+
       <div className="flex-grow-1 my-2" style={{ overflowY: "auto" }}>
         {searchResults.map(track => (
           <TrackSearchResult
             track={track}
             key={track.uri}
             chooseTrack={chooseTrack}
+            partyPlaylists={partyPlaylists}
+            spotifyApi={spotifyApi}
+            refreshPlaylists={refreshPlaylists}  // Passing the refreshPlaylists function
+            refreshTracks={refreshTracks}        // Passing refreshTracks for the current playlist update
+            selectedPlaylistId={selectedPlaylistId}
           />
         ))}
         {searchResults.length === 0 && (
@@ -109,9 +150,10 @@ export default function Dashboard({ code }) {
           </div>
         )}
       </div>
+
       <div>
         <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
       </div>
     </Container>
-  )
+  );
 }
