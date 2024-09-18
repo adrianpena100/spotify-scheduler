@@ -1,5 +1,5 @@
-import React, { useState } from 'react'; // Import React and useState for managing component state.
-import axios from 'axios'; // Import axios for making HTTP requests.
+import React, { useState } from "react"; // Import React and useState for managing component state.
+import axios from "axios"; // Import axios for making HTTP requests.
 
 const PlaySongButton = () => {
   // useState hook to manage the state for the track data and any potential error.
@@ -9,17 +9,20 @@ const PlaySongButton = () => {
   // Function to handle the button click and make the API call to fetch the track.
   const handlePlaySong = () => {
     // Make a POST request to the server's /api/get-song endpoint.
-    axios.post('http://localhost:3001/api/get-song', { uri: '58Q3FZFs1YXPpliWQB5kXB' })  // Only the track ID is passed in the request body.
-      .then(response => {
+    axios
+      .post("http://localhost:3001/api/get-song", {
+        uri: "58Q3FZFs1YXPpliWQB5kXB", // Only the track ID is passed in the request body.
+      })
+      .then((response) => {
         // If the API call is successful, update the track state with the data from the response.
         setTrack(response.data.track);
         // Log the track data to the console (for debugging purposes).
         console.log(response.data.track);
       })
-      .catch(error => {
+      .catch((error) => {
         // If the API call fails, log the error and update the error state with a relevant message.
-        console.error('Error fetching track:', error);
-        setError('Error fetching track');
+        console.error("Error fetching track:", error);
+        setError("Error fetching track");
       });
   };
 

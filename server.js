@@ -1,88 +1,92 @@
-require("dotenv").config()
-const express = require("express")
-const cors = require("cors")
-const bodyParser = require("body-parser")
-const SpotifyWebApi = require("spotify-web-api-node")
-const Genius = require("genius-lyrics-api") // Import the Genius API library
+require("dotenv").config(); // Load environment variables from .env file
+const express = require("express"); // Import Express framework
+const cors = require("cors"); // Import CORS middleware
+const bodyParser = require("body-parser"); // Import body-parser middleware
+const SpotifyWebApi = require("spotify-web-api-node"); // Import Spotify Web API library
+const Genius = require("genius-lyrics-api"); // Import the Genius API library
 
-const app = express()
-app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+const app = express(); // Create an Express application
+app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
+// Endpoint to refresh Spotify access token
 app.post("/refresh", (req, res) => {
-  const refreshToken = req.body.refreshToken
+  const refreshToken = req.body.refreshToken; // Get refresh token from request body
   const spotifyApi = new SpotifyWebApi({
     redirectUri: process.env.REDIRECT_URI,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     refreshToken,
-  })
+  });
 
+  // Refresh access token using Spotify API
   spotifyApi
     .refreshAccessToken()
-    .then(data => {
+    .then((data) => {
       res.json({
-        accessToken: data.body.accessToken,
-        expiresIn: data.body.expiresIn,
-      })
+        accessToken: data.body.accessToken, // Send new access token
+        expiresIn: data.body.expiresIn, // Send token expiration time
+      });
     })
-    .catch(err => {
-      console.log(err)
-      res.sendStatus(400)
-    })
-})
+    .catch((err) => {
+      console.log(err); // Log error
+      res.sendStatus(400); // Send error status
+    });
+});
 
+// Endpoint to log in to Spotify
 app.post("/login", (req, res) => {
-  const code = req.body.code
+  const code = req.body.code; // Get authorization code from request body
   const spotifyApi = new SpotifyWebApi({
     redirectUri: process.env.REDIRECT_URI,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-  })
+  });
 
+  // Exchange authorization code for access and refresh tokens
   spotifyApi
     .authorizationCodeGrant(code)
-    .then(data => {
+    .then((data) => {
       res.json({
-        accessToken: data.body.access_token,
-        refreshToken: data.body.refresh_token,
-        expiresIn: data.body.expires_in,
-      })
+        accessToken: data.body.access_token, // Send access token
+        refreshToken: data.body.refresh_token, // Send refresh token
+        expiresIn: data.body.expires_in, // Send token expiration time
+      });
     })
-    .catch(err => {
-      res.sendStatus(400)
-    })
-})
+    .catch((err) => {
+      res.sendStatus(400); // Send error status
+    });
+});
 
-// Modify the lyrics endpoint to use Genius API
+// Endpoint to get lyrics using Genius API
 app.get("/lyrics", async (req, res) => {
-  const { artist, track } = req.query;
+  const { artist, track } = req.query; // Get artist and track from query parameters
   console.log("Received request for lyrics:", track, artist);
 
   const options = {
-    apiKey: process.env.GENIUS_API_KEY,
+    apiKey: process.env.GENIUS_API_KEY, // Genius API key from environment variables
     title: track,
     artist: artist,
     optimizeQuery: true,
   };
 
   try {
-    const lyrics = await Genius.getLyrics(options);
+    const lyrics = await Genius.getLyrics(options); // Fetch lyrics from Genius API
     if (!lyrics) {
       console.log("No Lyrics Found");
-      res.json({ lyrics: "No Lyrics Found" });
+      res.json({ lyrics: "No Lyrics Found" }); // Send response if no lyrics found
     } else {
       console.log("Lyrics found:", lyrics);
-      res.json({ lyrics });
+      res.json({ lyrics }); // Send found lyrics
     }
   } catch (error) {
-    console.error("Error fetching lyrics:", error.message); // Log full error details
-    res.status(500).json({ lyrics: "Error fetching lyrics" });
+    console.error("Error fetching lyrics:", error.message); // Log error details
+    res.status(500).json({ lyrics: "Error fetching lyrics" }); // Send error response
   }
 });
 
-
+// Start the server on port 3001
 app.listen(3001, () => {
   console.log("Server is running on port 3001");
 });
