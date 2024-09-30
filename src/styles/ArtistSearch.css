@@ -1,0 +1,51 @@
+/* ArtistSearch.css */
+
+.artist-search-container {
+    margin: 20px;
+}
+
+.artist-search-form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.artist-search-input {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.artist-search-button {
+    padding: 10px;
+    background-color: #1db954;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.artist-search-button:hover {
+    background-color: #1ed760;
+}
+
+.artist-data-container {
+    margin-top: 20px;
+}
+
+.artist-image {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.artist-data-container h2 {
+    margin: 10px 0;
+}
+
+.artist-data-container p {
+    margin: 5px 0;
+}

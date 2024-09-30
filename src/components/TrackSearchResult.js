@@ -1,4 +1,5 @@
-import React, { useState } from "react"; // Import React and useState hook
+import React, { useState } from "react";
+import '../styles/TrackSearchResult.css';  // Import the CSS file
 
 export default function TrackSearchResult({
   track,
@@ -34,31 +35,21 @@ export default function TrackSearchResult({
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-between m-2"
-      style={{ cursor: "pointer" }}
-    >
-      <div
-        className="d-flex align-items-center"
-        onClick={() => chooseTrack(track)} // Handle track selection
-      >
-        <img
-          src={track.albumUrl}
-          style={{ height: "64px", width: "64px" }}
-          alt={track.title}
-        />
-        <div className="ml-3">
+    <div className="track-search-result">
+      <div className="track-details" onClick={() => chooseTrack(track)}>
+        <img src={track.albumUrl} alt={track.title} />
+        <div className="track-info">
           <div>{track.title}</div>
-          <div className="text-muted">{track.artist}</div>
+          <div className="track-artist">{track.artist}</div>
         </div>
       </div>
 
-      <div className="ml-auto">
+      <div className="add-button">
         {/* Dropdown to select which PARTY playlist to add to */}
         <select
           value={selectedPlaylist}
-          onChange={(e) => setSelectedPlaylist(e.target.value)} // Update selected playlist state on change
-          style={{ marginRight: "10px" }} // Adding margin-right for spacing
+          onChange={e => setSelectedPlaylist(e.target.value)}
+          className="playlist-select"
         >
           <option value="">Select Playlist</option>
           {partyPlaylists.map((playlist) => (

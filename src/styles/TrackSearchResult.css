@@ -1,0 +1,33 @@
+.track-search-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px;
+    cursor: pointer;
+  }
+  
+  .track-details {
+    display: flex;
+    align-items: center;
+  }
+  
+  .track-details img {
+    height: 64px;
+    width: 64px;
+  }
+  
+  .track-info {
+    margin-left: 15px;
+  }
+  
+  .track-artist {
+    color: #6c757d; /* Using Bootstrap muted text color */
+  }
+  
+  .playlist-select {
+    margin-right: 10px;
+  }
+  
+  .add-button {
+    margin-left: auto;
+  }

@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from "react"; // Add useCallback import
-import useAuth from "./useAuth"; // Import custom hook for authentication
-import Player from "./Player"; // Import Player component
-import TrackSearchResult from "./TrackSearchResult"; // Import TrackSearchResult component
-import { Container, Form } from "react-bootstrap"; // Import Bootstrap components
-import SpotifyWebApi from "spotify-web-api-node"; // Import Spotify Web API library
-import axios from "axios"; // Import axios for HTTP requests
-import CreatePlaylist from "./CreatePlaylist"; // Import CreatePlaylist component
-import DisplayPlaylists from "./DisplayPlaylists"; // Import DisplayPlaylists component
+import { useState, useEffect, useCallback } from "react";  // Add useCallback import
+import useAuth from "./useAuth";
+import Player from "./Player";
+import TrackSearchResult from "./TrackSearchResult";
+import { Container, Form } from "react-bootstrap";
+import SpotifyWebApi from "spotify-web-api-node";
+import axios from "axios";
+import CreatePlaylist from './CreatePlaylist';
+import DisplayPlaylists from './DisplayPlaylists';
+import '../styles/Dashboard.css';  // Import the CSS file
 
-// Initialize Spotify API with client ID
 const spotifyApi = new SpotifyWebApi({
   clientId: "69fd466f76c84dc9b965ac235c3c97b7",
 });
@@ -117,14 +117,8 @@ export default function Dashboard({ code }) {
   }, [search, accessToken]);
 
   return (
-    <Container
-      className="d-flex flex-column py-2"
-      style={{ height: "100vh", overflowY: "auto" }}
-    >
-      <CreatePlaylist
-        spotifyApi={spotifyApi}
-        refreshPlaylists={refreshPlaylists} // Pass refreshPlaylists function to CreatePlaylist component
-      />
+    <Container className="dashboard-container d-flex flex-column py-2">
+      <CreatePlaylist spotifyApi={spotifyApi} refreshPlaylists={refreshPlaylists} />
 
       <DisplayPlaylists
         partyPlaylists={partyPlaylists} // Pass party playlists to DisplayPlaylists component
@@ -140,13 +134,13 @@ export default function Dashboard({ code }) {
       <Form.Control
         type="search"
         placeholder="Search Songs/Artists"
-        value={search} // Bind input value to search state
-        onChange={(e) => setSearch(e.target.value)} // Update search state on input change
-        className="mt-3"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="search-control"
       />
 
-      <div className="flex-grow-1 my-2" style={{ overflowY: "auto" }}>
-        {searchResults.map((track) => (
+      <div className="search-results">
+        {searchResults.map(track => (
           <TrackSearchResult
             track={track}
             key={track.uri}
@@ -159,8 +153,8 @@ export default function Dashboard({ code }) {
           />
         ))}
         {searchResults.length === 0 && (
-          <div className="text-center" style={{ whiteSpace: "pre" }}>
-            {lyrics} {/* Display lyrics if no search results */}
+          <div className={`no-lyrics centered-text`}>
+            {lyrics}
           </div>
         )}
       </div>

@@ -1,14 +1,16 @@
-import { FaPlay, FaMinusCircle } from "react-icons/fa"; // Import play and minus icons
+import { FaPlay, FaMinusCircle } from 'react-icons/fa';
+import '../styles/DisplayPlaylists.css'; // Import the CSS file
 
-export default function DisplayPlaylists({
-  spotifyApi,
-  partyPlaylists,
-  onTrackSelect,
-  selectedPlaylistId,
-  setSelectedPlaylistId,
-  refreshTracks,
-  tracks,
+export default function DisplayPlaylists({ 
+  spotifyApi, 
+  partyPlaylists, 
+  onTrackSelect, 
+  selectedPlaylistId, 
+  setSelectedPlaylistId, 
+  refreshTracks, 
+  tracks 
 }) {
+
   // Fetch tracks when a playlist is clicked
   const handlePlaylistClick = (playlistId) => {
     setSelectedPlaylistId(playlistId); // Set the selected playlist ID
@@ -27,7 +29,7 @@ export default function DisplayPlaylists({
     spotifyApi
       .removeTracksFromPlaylist(selectedPlaylistId, [{ uri: trackUri }]) // Remove track from playlist
       .then(() => {
-        refreshTracks(selectedPlaylistId); // Refresh playlist after removing the track
+        refreshTracks(selectedPlaylistId);
       })
       .catch((err) => {
         console.error("Error removing track:", err); // Log error if track removal fails
@@ -35,35 +37,22 @@ export default function DisplayPlaylists({
   };
 
   return (
-    <div style={{ display: "flex", gap: "20px" }}>
+    <div className="display-playlists-container">
       {/* Playlists Section */}
-      <div style={{ maxHeight: "300px", overflowY: "auto", width: "30%" }}>
+      <div className="playlists-section">
         <h3>Your Party Playlists</h3>
-        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+        <ul className="playlists-list">
           {partyPlaylists.map((playlist) => (
             <li
               key={playlist.id}
-              onClick={() => handlePlaylistClick(playlist.id)} // Handle playlist click
-              style={{
-                cursor: "pointer",
-                marginBottom: "15px",
-                backgroundColor:
-                  selectedPlaylistId === playlist.id
-                    ? "#f0f0f0"
-                    : "transparent", // Highlight selected playlist
-                padding: "10px",
-                borderRadius: "8px",
-              }}
+              onClick={() => handlePlaylistClick(playlist.id)}
+              className={`playlist-item ${selectedPlaylistId === playlist.id ? 'selected' : ''}`}
             >
               <div>{formatPlaylistName(playlist.name)}</div>
-              <img
-                src={
-                  playlist.images && playlist.images.length > 0
-                    ? playlist.images[0].url // Display playlist image
-                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1BhBgvAdx2cQwiyvb-89VbGVzgQbB983tfw&s"
-                }
+              <img 
+                src={playlist.images && playlist.images.length > 0 ? playlist.images[0].url : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1BhBgvAdx2cQwiyvb-89VbGVzgQbB983tfw&s'}
                 alt={playlist.name}
-                style={{ width: "100px", height: "100px", borderRadius: "8px" }}
+                className="playlist-image"
               />
             </li>
           ))}
@@ -71,43 +60,29 @@ export default function DisplayPlaylists({
       </div>
 
       {/* Tracks Section */}
-      <div style={{ width: "70%", maxHeight: "300px", overflowY: "auto" }}>
+      <div className="tracks-section">
         {selectedPlaylistId ? (
           <>
             <h4>Tracks in Selected Playlist</h4>
-            <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+            <ul className="tracks-list">
               {tracks.map((item) => (
-                <li
-                  key={item.track.id}
-                  style={{
-                    marginBottom: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <FaPlay
-                      onClick={() =>
-                        onTrackSelect({
-                          title: item.track.name,
-                          artist: item.track.artists[0].name,
-                          uri: item.track.uri,
-                        })
-                      } // Handle track selection
-                      style={{
-                        marginRight: "10px",
-                        cursor: "pointer",
-                        color: "green",
-                      }}
+                <li key={item.track.id} className="track-item">
+                  <div className="track-info">
+                    <FaPlay 
+                      onClick={() => onTrackSelect({
+                        title: item.track.name,
+                        artist: item.track.artists[0].name,
+                        uri: item.track.uri
+                      })}
+                      className="play-icon"
                     />
                     <div>
                       {item.track.name} - {item.track.artists[0].name}
                     </div>
                   </div>
-                  <FaMinusCircle
-                    onClick={() => handleRemoveTrack(item.track.uri)} // Handle track removal
-                    style={{ cursor: "pointer", color: "red" }}
+                  <FaMinusCircle 
+                    onClick={() => handleRemoveTrack(item.track.uri)} 
+                    className="remove-icon"
                   />
                 </li>
               ))}
