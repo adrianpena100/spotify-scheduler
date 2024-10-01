@@ -1,0 +1,18 @@
+/* ResizableBox.css */
+.resizable-box {
+    display: flex;
+    border: 1px solid #ccc;  /* Add border for visibility */
+    padding: 1rem;           /* Add some padding */
+    position: relative;       /* Positioning context for resizer */
+    overflow: hidden;         /* Prevent overflow */
+}
+
+.resizer {
+    width: 10px;              /* Width of the resizer */
+    cursor: ew-resize;        /* Change cursor to indicate horizontal resizing */
+    background: #ddd;         /* Color of the resizer */
+    position: absolute;        /* Position absolute to align with the right edge */
+    right: 0;                 /* Align to the right edge */
+    top: 0;
+    height: 100%;             /* Full height of the box */
+}

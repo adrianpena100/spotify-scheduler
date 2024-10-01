@@ -8,6 +8,7 @@ import axios from "axios";
 import CreatePlaylist from './CreatePlaylist';
 import DisplayPlaylists from './DisplayPlaylists';
 import '../styles/Dashboard.css';  // Import the CSS file
+import ResizableBox from './ResizableBox';
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "69fd466f76c84dc9b965ac235c3c97b7",
@@ -118,51 +119,52 @@ export default function Dashboard({ code }) {
 
   return (
     <Container className="dashboard-container d-flex flex-column py-2">
-      <CreatePlaylist spotifyApi={spotifyApi} refreshPlaylists={refreshPlaylists} />
+        <CreatePlaylist spotifyApi={spotifyApi} refreshPlaylists={refreshPlaylists} />
 
-      <DisplayPlaylists
-        partyPlaylists={partyPlaylists} // Pass party playlists to DisplayPlaylists component
-        spotifyApi={spotifyApi}
-        accessToken={accessToken}
-        onTrackSelect={chooseTrack} // Pass chooseTrack function to DisplayPlaylists component
-        selectedPlaylistId={selectedPlaylistId}
-        setSelectedPlaylistId={setSelectedPlaylistId}
-        refreshTracks={refreshTracks} // Pass refreshTracks function to DisplayPlaylists component
-        tracks={tracks}
-      />
-
-      <Form.Control
-        type="search"
-        placeholder="Search Songs/Artists"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="search-control"
-      />
-
-      <div className="search-results">
-        {searchResults.map(track => (
-          <TrackSearchResult
-            track={track}
-            key={track.uri}
-            chooseTrack={chooseTrack} // Pass chooseTrack function to TrackSearchResult component
-            partyPlaylists={partyPlaylists} // Pass party playlists to TrackSearchResult component
+        <DisplayPlaylists
+            partyPlaylists={partyPlaylists}
             spotifyApi={spotifyApi}
-            refreshPlaylists={refreshPlaylists} // Pass refreshPlaylists function to TrackSearchResult component
-            refreshTracks={refreshTracks} // Pass refreshTracks function to TrackSearchResult component
+            accessToken={accessToken}
+            onTrackSelect={chooseTrack}
             selectedPlaylistId={selectedPlaylistId}
-          />
-        ))}
-        {searchResults.length === 0 && (
-          <div className={`no-lyrics centered-text`}>
-            {lyrics}
-          </div>
-        )}
-      </div>
+            setSelectedPlaylistId={setSelectedPlaylistId}
+            refreshTracks={refreshTracks}
+            tracks={tracks}
+        />
 
-      <div>
-        <Player accessToken={accessToken} trackUri={playingTrack?.uri} />{" "}
-        {/* Pass accessToken and trackUri to Player component */}
-      </div>
+        <Form.Control
+            type="search"
+            placeholder="Search Songs/Artists"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="search-control"
+        />
+
+        <ResizableBox>
+            <div className="search-results">
+                {searchResults.map(track => (
+                    <TrackSearchResult
+                        track={track}
+                        key={track.uri}
+                        chooseTrack={chooseTrack}
+                        partyPlaylists={partyPlaylists}
+                        spotifyApi={spotifyApi}
+                        refreshPlaylists={refreshPlaylists}
+                        refreshTracks={refreshTracks}
+                        selectedPlaylistId={selectedPlaylistId}
+                    />
+                ))}
+                {searchResults.length === 0 && (
+                    <div className={`no-lyrics centered-text`}>
+                        {lyrics}
+                    </div>
+                )}
+            </div>
+        </ResizableBox>
+
+        <div>
+            <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
+        </div>
     </Container>
-  );
+);
 }
