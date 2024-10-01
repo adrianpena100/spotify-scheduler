@@ -1,0 +1,24 @@
+/* Dashboard.css */
+
+.dashboard-container {
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .search-control {
+    margin-top: 1rem;
+  }
+  
+  .search-results {
+    flex-grow: 1;
+    margin: 1rem 0;
+    overflow-y: auto;
+  }
+  
+  .no-lyrics {
+    white-space: pre;
+  }
+  
+  .centered-text {
+    text-align: center;
+  }

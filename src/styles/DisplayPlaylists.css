@@ -1,0 +1,82 @@
+/* DisplayPlaylists.css */
+
+.display-playlists-container {
+    display: flex;
+    gap: 20px;
+}
+
+.playlists-section {
+    max-height: 300px;
+    overflow-y: auto;
+    width: 30%;
+}
+
+.playlists-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.playlist-item {
+    cursor: pointer;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.playlist-item.selected {
+    background-color: #f0f0f0;
+}
+
+.playlist-item:hover {
+    background-color: #e0e0e0;
+}
+
+.playlist-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+}
+
+.tracks-section {
+    width: 70%;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tracks-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.track-info {
+    display: flex;
+    align-items: center;
+}
+
+.play-icon {
+    margin-right: 10px;
+    cursor: pointer;
+    color: green;
+}
+
+.play-icon:hover {
+    color: darkgreen;
+}
+
+.remove-icon {
+    cursor: pointer;
+    color: red;
+}
+
+.remove-icon:hover {
+    color: darkred;
+}

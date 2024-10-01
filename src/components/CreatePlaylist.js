@@ -1,4 +1,5 @@
-import React, { useState } from "react"; // Import React and useState hook
+import React, { useState } from 'react';
+import '../styles/CreatePlaylist.css'; // Import the CSS file
 
 export default function CreatePlaylist({ spotifyApi, refreshPlaylists }) {
   const [playlistName, setPlaylistName] = useState(""); // State to hold the playlist name
@@ -27,17 +28,18 @@ export default function CreatePlaylist({ spotifyApi, refreshPlaylists }) {
   };
 
   return (
-    <div>
+    <div className="create-playlist-container">
       <h3>Create a Party Playlist</h3>
-      <form onSubmit={handleCreatePlaylist}>
+      <form onSubmit={handleCreatePlaylist} className="create-playlist-form">
         <input
           type="text"
-          value={playlistName} // Bind input value to playlistName state
-          onChange={(e) => setPlaylistName(e.target.value)} // Update state on input change
-          placeholder="Enter playlist name" // Input placeholder text
-          required // Make input required
+          value={playlistName}
+          onChange={(e) => setPlaylistName(e.target.value)}
+          placeholder="Enter playlist name"
+          required
+          className="create-playlist-input"
         />
-        <button type="submit">Create Playlist</button> {/* Submit button */}
+        <button type="submit" className="create-playlist-button">Create Playlist</button>
       </form>
     </div>
   );
