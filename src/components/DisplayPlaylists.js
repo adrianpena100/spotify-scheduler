@@ -1,4 +1,4 @@
-import { FaPlay, FaMinusCircle } from 'react-icons/fa';
+import { FaPlay, FaTrash, FaMinusCircle } from 'react-icons/fa'; // Import both FaTrash and FaMinusCircle
 import '../styles/DisplayPlaylists.css'; // Import the CSS file
 
 export default function DisplayPlaylists({ 
@@ -8,37 +8,33 @@ export default function DisplayPlaylists({
   selectedPlaylistId, 
   setSelectedPlaylistId, 
   refreshTracks, 
-  tracks 
+  tracks, 
+  currentTrackIndex, 
+  deletePlaylist 
 }) {
 
-  // Fetch tracks when a playlist is clicked
   const handlePlaylistClick = (playlistId) => {
-    setSelectedPlaylistId(playlistId); // Set the selected playlist ID
-    refreshTracks(playlistId); // Refresh tracks of the selected playlist
+    setSelectedPlaylistId(playlistId); 
+    refreshTracks(playlistId);
   };
 
-  // Function to remove "- PARTY" from playlist names
   const formatPlaylistName = (name) => {
-    return name.replace(" - PARTY", ""); // Remove " - PARTY" suffix from playlist name
+    return name.replace(" - PARTY", ""); 
   };
 
-  // Handle song removal from playlist
   const handleRemoveTrack = (trackUri) => {
     if (!selectedPlaylistId) return;
 
     spotifyApi
-      .removeTracksFromPlaylist(selectedPlaylistId, [{ uri: trackUri }]) // Remove track from playlist
+      .removeTracksFromPlaylist(selectedPlaylistId, [{ uri: trackUri }])
       .then(() => {
         refreshTracks(selectedPlaylistId);
       })
-      .catch((err) => {
-        console.error("Error removing track:", err); // Log error if track removal fails
-      });
+      .catch((err) => console.error("Error removing track:", err));
   };
 
   return (
     <div className="display-playlists-container">
-      {/* Playlists Section */}
       <div className="playlists-section">
         <h3>Your Party Playlists</h3>
         <ul className="playlists-list">
@@ -54,26 +50,33 @@ export default function DisplayPlaylists({
                 alt={playlist.name}
                 className="playlist-image"
               />
+              <FaTrash 
+                onClick={() => deletePlaylist(playlist.id)} 
+                className="trash-icon" 
+                title="Delete playlist"
+              />
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Tracks Section */}
       <div className="tracks-section">
         {selectedPlaylistId ? (
           <>
             <h4>Tracks in Selected Playlist</h4>
             <ul className="tracks-list">
-              {tracks.map((item) => (
-                <li key={item.track.id} className="track-item">
+              {tracks.map((item, index) => (
+                <li 
+                  key={item.track.id} 
+                  className={`track-item ${currentTrackIndex === index ? 'playing' : ''}`}
+                >
                   <div className="track-info">
                     <FaPlay 
                       onClick={() => onTrackSelect({
                         title: item.track.name,
                         artist: item.track.artists[0].name,
                         uri: item.track.uri
-                      })}
+                      }, index)} 
                       className="play-icon"
                     />
                     <div>
@@ -83,13 +86,14 @@ export default function DisplayPlaylists({
                   <FaMinusCircle 
                     onClick={() => handleRemoveTrack(item.track.uri)} 
                     className="remove-icon"
+                    title="Remove track"
                   />
                 </li>
               ))}
             </ul>
           </>
         ) : (
-          <h4>Select a Playlist to View Tracks</h4> // Prompt to select a playlist
+          <h4>Select a Playlist to View Tracks</h4>
         )}
       </div>
     </div>
