@@ -11,29 +11,32 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Endpoint to refresh Spotify access token
-app.post("/refresh", (req, res) => {
-  const refreshToken = req.body.refreshToken; // Get refresh token from request body
-  const spotifyApi = new SpotifyWebApi({
-    redirectUri: process.env.REDIRECT_URI,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken,
-  });
+// Backend logic to handle token refreshing
+app.post('/refresh', (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  
+  if (!refreshToken) {
+    return res.sendStatus(401);
+  }
 
-  // Refresh access token using Spotify API
-  spotifyApi
-    .refreshAccessToken()
-    .then((data) => {
+  axios
+    .post('https://accounts.spotify.com/api/token', {
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: YOUR_CLIENT_ID,
+      client_secret: YOUR_CLIENT_SECRET,
+    })
+    .then(response => {
       res.json({
-        accessToken: data.body.accessToken, // Send new access token
-        expiresIn: data.body.expiresIn, // Send token expiration time
+        accessToken: response.data.access_token,
+        expiresIn: response.data.expires_in
       });
     })
-    .catch((err) => {
-      console.log(err); // Log error
-      res.sendStatus(400); // Send error status
+    .catch(() => {
+      res.sendStatus(401);
     });
 });
+
 
 // Endpoint to log in to Spotify
 app.post("/login", (req, res) => {

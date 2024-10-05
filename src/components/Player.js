@@ -1,23 +1,47 @@
-import { useState, useEffect } from "react"; // Import useState and useEffect hooks from React
-import SpotifyPlayer from "react-spotify-web-playback"; // Import SpotifyPlayer component
+import { useState, useEffect } from "react";
+import SpotifyPlayer from "react-spotify-web-playback"; 
 
-export default function Player({ accessToken, trackUri }) {
-  const [play, setPlay] = useState(false); // State to control playback
+export default function Player({ accessToken, trackUri, onNextTrack, onPreviousTrack, isPlaying, setIsPlaying }) {
+  const [play, setPlay] = useState(false); 
 
   // Effect to start playback when trackUri changes
-  useEffect(() => setPlay(true), [trackUri]);
+  useEffect(() => {
+    if (trackUri) {
+      setPlay(true); 
+      setIsPlaying(true); // Ensure we are playing the track when it's selected
+    }
+  }, [trackUri]);
 
-  if (!accessToken) return null; // Return null if no access token is provided
+  if (!accessToken) return null; 
 
   return (
     <SpotifyPlayer
-      token={accessToken} // Spotify access token
-      showSaveIcon // Show save icon on the player
+      token={accessToken} 
+      showSaveIcon 
       callback={(state) => {
-        if (!state.isPlaying) setPlay(false); // Update play state when playback stops
+        if (!state.isPlaying) {
+          setPlay(false); 
+          setIsPlaying(false);
+        } else {
+          setIsPlaying(true);
+        }
+
+        // Automatically play the next track when the current one ends
+        if (state.track && state.position === 0 && state.progressMs > 0 && state.progressMs < 1000) {
+          onNextTrack(); 
+        }
       }}
-      play={play} // Control playback state
-      uris={trackUri ? [trackUri] : []} // Track URI to play
+      play={play} 
+      uris={trackUri ? [trackUri] : []} 
+      styles={{
+        activeColor: '#1DB954',
+        bgColor: '#333',
+        color: '#fff',
+        loaderColor: '#fff',
+        sliderColor: '#1DB954',
+        trackArtistColor: '#ccc',
+        trackNameColor: '#fff',
+      }}
     />
   );
 }

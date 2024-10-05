@@ -80,3 +80,39 @@
 .remove-icon:hover {
     color: darkred;
 }
+
+/* Styling for delete playlist icon */
+.delete-playlist-icon {
+    color: #d9534f; /* Red color for delete icon */
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .delete-playlist-icon:hover {
+    color: #c9302c; /* Darker red on hover */
+  }
+
+  /* Styling for the trash icon */
+.trash-icon {
+    margin-left: 10px; /* Move it slightly to the right */
+    color: red; /* Make the trashcan icon red */
+    cursor: pointer; /* Change cursor to pointer on hover */
+  }
+  
+  .trash-icon:hover {
+    color: darkred; /* Make it darker when hovered */
+  }
+  
+
+  /* Add this in your DisplayPlaylists.css */
+.track-item.playing {
+    background-color: #343a40; /* Darker grey background */
+    color: white;
+  }
+  
+  .track-item.playing .track-info {
+    font-weight: bold; /* Bold the currently playing song */
+  }
+  
+  
