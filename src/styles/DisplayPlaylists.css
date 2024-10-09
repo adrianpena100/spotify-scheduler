@@ -18,19 +18,24 @@
 
 .playlist-item {
     cursor: pointer;
+    justify-content: space-between;
     margin-bottom: 15px;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 5px;
+    align-items: center;
     background-color: transparent;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s;
 }
 
 .playlist-item.selected {
-    background-color: #f0f0f0;
+    background-color: rgba(255, 255, 255, 0.1); /* Same subtle white highlight for selected playlists */
+    color: #e0e0e0; /* Ensure the text color matches */
 }
 
 .playlist-item:hover {
-    background-color: #e0e0e0;
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle white highlight */
+    color: #e0e0e0; /* Light gray text */
+    cursor: pointer;
 }
 
 .playlist-image {
