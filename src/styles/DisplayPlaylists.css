@@ -55,6 +55,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .track-info {
@@ -62,15 +63,27 @@
     align-items: center;
 }
 
+.track-item.playing {
+    background-color: #343a40; /* Darker grey background */
+    color: white;
+}
+
+.track-item.playing .track-info {
+    font-weight: bold; /* Bold the currently playing song */
+}
+
+/* src/styles/DisplayPlaylists.css */
+
 .play-icon {
     margin-right: 10px;
     cursor: pointer;
-    color: green;
+    color: #1DB954; /* Spotify Green */
 }
 
 .play-icon:hover {
-    color: darkgreen;
+    color: #1ed760; /* Lighter Green on hover */
 }
+
 
 .remove-icon {
     cursor: pointer;
@@ -114,5 +127,7 @@
   .track-item.playing .track-info {
     font-weight: bold; /* Bold the currently playing song */
   }
+
+  
   
   

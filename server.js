@@ -1,9 +1,13 @@
+// server.js
+
 require("dotenv").config(); // Load environment variables from .env file
 const express = require("express"); // Import Express framework
 const cors = require("cors"); // Import CORS middleware
 const bodyParser = require("body-parser"); // Import body-parser middleware
 const SpotifyWebApi = require("spotify-web-api-node"); // Import Spotify Web API library
 const Genius = require("genius-lyrics-api"); // Import the Genius API library
+const axios = require("axios"); // Import axios for HTTP requests
+const { URLSearchParams } = require('url'); // Import URLSearchParams
 
 const app = express(); // Create an Express application
 app.use(cors()); // Enable CORS for all routes
@@ -11,7 +15,6 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Endpoint to refresh Spotify access token
-// Backend logic to handle token refreshing
 app.post('/refresh', (req, res) => {
   const refreshToken = req.body.refreshToken;
   
@@ -19,12 +22,17 @@ app.post('/refresh', (req, res) => {
     return res.sendStatus(401);
   }
 
+  const params = new URLSearchParams();
+  params.append('grant_type', 'refresh_token');
+  params.append('refresh_token', refreshToken);
+  params.append('client_id', process.env.CLIENT_ID);
+  params.append('client_secret', process.env.CLIENT_SECRET);
+
   axios
-    .post('https://accounts.spotify.com/api/token', {
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      client_id: YOUR_CLIENT_ID,
-      client_secret: YOUR_CLIENT_SECRET,
+    .post('https://accounts.spotify.com/api/token', params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     })
     .then(response => {
       res.json({
@@ -32,11 +40,11 @@ app.post('/refresh', (req, res) => {
         expiresIn: response.data.expires_in
       });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error("Error refreshing token:", err.message);
       res.sendStatus(401);
     });
 });
-
 
 // Endpoint to log in to Spotify
 app.post("/login", (req, res) => {
@@ -58,6 +66,7 @@ app.post("/login", (req, res) => {
       });
     })
     .catch((err) => {
+      console.error("Error during authorization code grant:", err.message);
       res.sendStatus(400); // Send error status
     });
 });

@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+// src/components/Player.js
+
 import SpotifyPlayer from "react-spotify-web-playback"; 
 
-export default function Player({ accessToken, trackUri, onNextTrack, onPreviousTrack, isPlaying, setIsPlaying }) {
-  const [play, setPlay] = useState(false); 
-
-  // Effect to start playback when trackUri changes
-  useEffect(() => {
-    if (trackUri) {
-      setPlay(true); 
-      setIsPlaying(true); // Ensure we are playing the track when it's selected
-    }
-  }, [trackUri]);
-
+export default function Player({ 
+  accessToken, 
+  trackUris, 
+  index, 
+  onNextTrack, 
+  onPreviousTrack, 
+  isPlaying, 
+  setIsPlaying,
+  onTrackChange // New prop to handle track changes
+}) {
   if (!accessToken) return null; 
 
   return (
@@ -20,10 +20,14 @@ export default function Player({ accessToken, trackUri, onNextTrack, onPreviousT
       showSaveIcon 
       callback={(state) => {
         if (!state.isPlaying) {
-          setPlay(false); 
           setIsPlaying(false);
         } else {
           setIsPlaying(true);
+        }
+
+        // Detect track changes initiated by the web SDK (next/previous)
+        if (state.track && state.track.uri !== (trackUris[index] || '')) {
+          onTrackChange(state.track.uri);
         }
 
         // Automatically play the next track when the current one ends
@@ -31,8 +35,9 @@ export default function Player({ accessToken, trackUri, onNextTrack, onPreviousT
           onNextTrack(); 
         }
       }}
-      play={play} 
-      uris={trackUri ? [trackUri] : []} 
+      play={isPlaying} 
+      uris={trackUris.length > 0 ? trackUris : []} 
+      index={index !== null ? index : 0} // Default to first track if index is null
       styles={{
         activeColor: '#1DB954',
         bgColor: '#333',

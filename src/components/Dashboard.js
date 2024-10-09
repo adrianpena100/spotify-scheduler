@@ -1,3 +1,5 @@
+// src/components/Dashboard.js
+
 import { useState, useEffect, useCallback } from "react";
 import useAuth from "./useAuth";
 import Player from "./Player";
@@ -11,7 +13,7 @@ import '../styles/Dashboard.css';
 import { ResizableBox } from 'react-resizable';
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: "69fd466f76c84dc9b965ac235c3c97b7",
+  clientId: "YOUR_SPOTIFY_CLIENT_ID", // Replace with your actual client ID
 });
 
 export default function Dashboard({ code }) {
@@ -33,7 +35,7 @@ export default function Dashboard({ code }) {
     if (confirmed) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      localStorage.removeItem('expiresIn');
+      localStorage.removeItem('expiresAt'); // Updated to 'expiresAt'
       localStorage.setItem('loggedOut', 'true');
       window.location = '/';
     }
@@ -47,7 +49,7 @@ export default function Dashboard({ code }) {
       setCurrentTrackIndex(index); 
       setSearch(""); 
       setLyrics(""); 
-      setIsPlaying(true);
+      setIsPlaying(true); // Ensure play starts when a new track is selected
     }
   };
 
@@ -65,10 +67,14 @@ export default function Dashboard({ code }) {
       }
     } else {
       // Loop back to the first track
-      chooseTrack(tracks[0].track, 0);
+      chooseTrack({
+        title: tracks[0].track.name,
+        artist: tracks[0].track.artists[0].name,
+        uri: tracks[0].track.uri,
+      }, 0);
     }
   };
-
+  
   const handlePreviousTrack = () => {
     if (tracks.length === 0 || currentTrackIndex === null) return;
     const prevIndex = currentTrackIndex - 1;
@@ -83,7 +89,15 @@ export default function Dashboard({ code }) {
       }
     } else {
       // Loop back to the last track
-      chooseTrack(tracks[tracks.length - 1].track, tracks.length - 1);
+      const lastIndex = tracks.length - 1;
+      const lastTrack = tracks[lastIndex]?.track;
+      if (lastTrack) {
+        chooseTrack({
+          title: lastTrack.name,
+          artist: lastTrack.artists[0].name,
+          uri: lastTrack.uri,
+        }, lastIndex);
+      }
     }
   };
 
@@ -112,10 +126,45 @@ export default function Dashboard({ code }) {
     if (!playlistId) return;
     spotifyApi.getPlaylistTracks(playlistId)
       .then((res) => {
-        setTracks(res.body.items);
-        setCurrentTrackIndex(null); // Reset track index when switching playlists
+        const newTracks = res.body.items;
+        setTracks(newTracks);
+
+        if (isPlaying && playingTrack) {
+          const existingTrack = newTracks.find(item => item.track.uri === playingTrack.uri);
+          if (existingTrack) {
+            const newIndex = newTracks.findIndex(item => item.track.uri === playingTrack.uri);
+            setCurrentTrackIndex(newIndex);
+          } else {
+            // Current playing track is not in the new playlist
+            setPlayingTrack(null);
+            setCurrentTrackIndex(null);
+            setIsPlaying(false);
+          }
+        } else {
+          // If not playing, reset playingTrack and currentTrackIndex
+          setPlayingTrack(null);
+          setCurrentTrackIndex(null);
+        }
       })
       .catch((err) => console.error("Error fetching playlist tracks:", err));
+  };
+
+  // Handler for track changes from the Player component
+  const handleTrackChange = (newUri) => {
+    if (!newUri) return;
+    if (playingTrack?.uri === newUri) return; // Avoid redundant updates
+
+    const index = tracks.findIndex(track => track.track.uri === newUri);
+    if (index !== -1) {
+      const track = tracks[index].track;
+      setPlayingTrack({
+        title: track.name,
+        artist: track.artists[0].name,
+        uri: track.uri,
+      });
+      setCurrentTrackIndex(index);
+      setIsPlaying(true);
+    }
   };
 
   useEffect(() => {
@@ -125,7 +174,10 @@ export default function Dashboard({ code }) {
   }, [accessToken, refreshPlaylists]);
 
   useEffect(() => {
-    if (!playingTrack) return;
+    if (!playingTrack) {
+      setLyrics(""); // Clear lyrics if no track is playing
+      return;
+    }
     axios.get("http://localhost:3001/lyrics", {
       params: { track: playingTrack.title, artist: playingTrack.artist }
     })
@@ -212,19 +264,30 @@ export default function Dashboard({ code }) {
                 selectedPlaylistId={selectedPlaylistId}
               />
             ))}
-            {searchResults.length === 0 && <div className="no-lyrics centered-text">{lyrics}</div>}
+            {searchResults.length === 0 && lyrics && <div className="no-lyrics centered-text">{lyrics}</div>}
           </div>
         </>
       </ResizableBox>
 
+      {/* Player Component */}
       <Player 
         accessToken={accessToken}
-        trackUri={playingTrack?.uri}
+        trackUris={tracks.map(t => t.track.uri)}
+        index={currentTrackIndex}
         onNextTrack={handleNextTrack}
         onPreviousTrack={handlePreviousTrack}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
+        onTrackChange={handleTrackChange} // Pass the handler
       />
+
+      {/* Lyrics Display Section */}
+      {lyrics && (
+        <div className="lyrics-container">
+          <h3>Lyrics</h3>
+          <pre>{lyrics}</pre>
+        </div>
+      )}
     </Container>
   );
 }

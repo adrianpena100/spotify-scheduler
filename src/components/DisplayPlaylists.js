@@ -1,5 +1,7 @@
-import { FaPlay, FaTrash, FaMinusCircle } from 'react-icons/fa'; // Import both FaTrash and FaMinusCircle
-import '../styles/DisplayPlaylists.css'; // Import the CSS file
+// src/components/DisplayPlaylists.js
+
+import { FaPlay, FaTrash, FaMinusCircle } from 'react-icons/fa';
+import '../styles/DisplayPlaylists.css';
 
 export default function DisplayPlaylists({ 
   spotifyApi, 
@@ -14,6 +16,7 @@ export default function DisplayPlaylists({
 }) {
 
   const handlePlaylistClick = (playlistId) => {
+    if (selectedPlaylistId === playlistId) return; // Do nothing if the same playlist is clicked
     setSelectedPlaylistId(playlistId); 
     refreshTracks(playlistId);
   };
@@ -31,6 +34,11 @@ export default function DisplayPlaylists({
         refreshTracks(selectedPlaylistId);
       })
       .catch((err) => console.error("Error removing track:", err));
+  };
+
+  const handlePlayClick = (e, track, index) => {
+    e.stopPropagation(); // Prevent triggering the playlist click
+    onTrackSelect(track, index);
   };
 
   return (
@@ -51,7 +59,10 @@ export default function DisplayPlaylists({
                 className="playlist-image"
               />
               <FaTrash 
-                onClick={() => deletePlaylist(playlist.id)} 
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering playlist click
+                  deletePlaylist(playlist.id);
+                }} 
                 className="trash-icon" 
                 title="Delete playlist"
               />
@@ -70,18 +81,17 @@ export default function DisplayPlaylists({
                   key={item.track.id} 
                   className={`track-item ${currentTrackIndex === index ? 'playing' : ''}`}
                 >
+                  <FaPlay 
+                    className="play-icon"
+                    title="Play Track"
+                    onClick={(e) => handlePlayClick(e, {
+                      title: item.track.name,
+                      artist: item.track.artists[0].name,
+                      uri: item.track.uri
+                    }, index)}
+                  />
                   <div className="track-info">
-                    <FaPlay 
-                      onClick={() => onTrackSelect({
-                        title: item.track.name,
-                        artist: item.track.artists[0].name,
-                        uri: item.track.uri
-                      }, index)} 
-                      className="play-icon"
-                    />
-                    <div>
-                      {item.track.name} - {item.track.artists[0].name}
-                    </div>
+                    {item.track.name} - {item.track.artists[0].name}
                   </div>
                   <FaMinusCircle 
                     onClick={() => handleRemoveTrack(item.track.uri)} 

@@ -1,12 +1,14 @@
+// src/components/useAuth.js
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function useAuth(code) {
   // Initialize state variables to hold tokens and expiration time, 
   // retrieving them from localStorage if they exist
-  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken')); 
-  const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken'));
-  const [expiresIn, setExpiresIn] = useState(localStorage.getItem('expiresIn'));
+  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || null); 
+  const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken') || null);
+  const [expiresAt, setExpiresAt] = useState(localStorage.getItem('expiresAt') ? parseInt(localStorage.getItem('expiresAt')) : null);
 
   // useEffect to exchange the authorization code for access and refresh tokens
   // This only runs if a code is provided and no access token exists yet
@@ -20,12 +22,14 @@ export default function useAuth(code) {
         // Store tokens in state variables
         setAccessToken(res.data.accessToken);
         setRefreshToken(res.data.refreshToken);
-        setExpiresIn(res.data.expiresIn);
+        const expiresIn = res.data.expiresIn;
+        const calculatedExpiresAt = Date.now() + expiresIn * 1000;
+        setExpiresAt(calculatedExpiresAt);
 
         // Store the tokens and expiration time in localStorage for persistence
         localStorage.setItem('accessToken', res.data.accessToken);
         localStorage.setItem('refreshToken', res.data.refreshToken);
-        localStorage.setItem('expiresIn', res.data.expiresIn);
+        localStorage.setItem('expiresAt', calculatedExpiresAt.toString());
 
         // Clear the 'loggedOut' flag since the user has logged in successfully
         localStorage.removeItem('loggedOut');
@@ -40,29 +44,41 @@ export default function useAuth(code) {
 
   // useEffect to refresh the access token automatically before it expires
   useEffect(() => {
-    if (!refreshToken || !expiresIn) return; // Skip if refreshToken or expiresIn is missing
+    if (!refreshToken || !expiresAt) return; // Skip if refreshToken or expiresAt is missing
 
-    // Set an interval to refresh the token 1 minute before expiration
-    const interval = setInterval(() => {
+    const refreshInterval = expiresAt - Date.now() - 60000; // 1 minute before expiration
+
+    if (refreshInterval <= 0) {
+      // Token already expired or about to expire, refresh immediately
+      refreshAccessToken();
+    } else {
+      const timeout = setTimeout(() => {
+        refreshAccessToken();
+      }, refreshInterval);
+
+      // Cleanup the timeout when the component unmounts or dependencies change
+      return () => clearTimeout(timeout);
+    }
+
+    function refreshAccessToken() {
       axios
         .post("http://localhost:3001/refresh", { refreshToken }) // Send refresh token to backend
         .then((res) => {
           // Update the access token and expiration time
           setAccessToken(res.data.accessToken);
-          setExpiresIn(res.data.expiresIn);
+          const newExpiresAt = Date.now() + res.data.expiresIn * 1000;
+          setExpiresAt(newExpiresAt);
 
           // Also store the new token and expiration in localStorage
           localStorage.setItem('accessToken', res.data.accessToken);
-          localStorage.setItem('expiresIn', res.data.expiresIn);
+          localStorage.setItem('expiresAt', newExpiresAt.toString());
         })
         .catch(() => {
           window.location = "/"; // Redirect to login if token refresh fails
         });
-    }, (expiresIn - 60) * 1000); // Set the interval to run 1 minute before expiration
+    }
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(interval);
-  }, [refreshToken, expiresIn]); // Only run when refreshToken or expiresIn changes
+  }, [refreshToken, expiresAt]); // Only run when refreshToken or expiresAt changes
 
   // Return the access token to be used by other components
   return accessToken;
