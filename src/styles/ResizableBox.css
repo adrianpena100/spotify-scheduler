@@ -1,18 +1,29 @@
 /* ResizableBox.css */
 .resizable-box {
+    background-color: #121212;
     display: flex;
-    border: 1px solid #ccc;  /* Add border for visibility */
-    padding: 1rem;           /* Add some padding */
-    position: relative;       /* Positioning context for resizer */
-    overflow: hidden;         /* Prevent overflow */
+    border: 1px solid #ccc;  /* Subtle border for visibility */
+    padding: 1rem;           /* Padding inside the box */
+    position: relative;      /* Positioning context for resizer */
+    overflow: hidden;        /* Prevent overflow */
+    border-radius: 8px;     /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Light shadow for depth */
 }
 
+/* Style for the resizer */
 .resizer {
     width: 10px;              /* Width of the resizer */
     cursor: ew-resize;        /* Change cursor to indicate horizontal resizing */
-    background: #ddd;         /* Color of the resizer */
-    position: absolute;        /* Position absolute to align with the right edge */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+    position: absolute;       /* Position absolute to align with the right edge */
     right: 0;                 /* Align to the right edge */
     top: 0;
     height: 100%;             /* Full height of the box */
+    opacity: 0.5;             /* Make resizer less prominent */
+    transition: background-color 0.3s ease, opacity 0.3s ease; /* Smooth hover effect */
+}
+
+.resizer:hover {
+    background-color: rgba(0, 0, 0, 0.2); /* Change color on hover */
+    opacity: 1;               /* Increase opacity on hover */
 }
