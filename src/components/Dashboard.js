@@ -30,7 +30,7 @@ export default function Dashboard({ code }) {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
 
   const [showMessageBox, setShowMessageBox] = useState(false); // State to manage message box visibility
-  const [message, setMessage] = useState(''); // State to manage the message input
+  const [messages, setMessages] = useState([]); // State to manage the list of messages
 
   const handleLogout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");
@@ -165,11 +165,9 @@ export default function Dashboard({ code }) {
   }, [search, accessToken]);
 
   useEffect(() => {
-    // Read the message from local storage
-    const storedMessage = localStorage.getItem('loginMessage');
-    if (storedMessage) {
-      setMessage(storedMessage);
-    }
+    // Read the messages from local storage
+    const storedMessages = JSON.parse(localStorage.getItem('loginMessages')) || [];
+    setMessages(storedMessages);
   }, []);
 
   return (
@@ -187,7 +185,11 @@ export default function Dashboard({ code }) {
 
       {showMessageBox && (
         <div style={{ marginBottom: '10px' }}>
-          <p>{message}</p>
+          <ul>
+            {messages.map((msg, index) => (
+              <li key={index}>{msg}</li>
+            ))}
+          </ul>
         </div>
       )}
 
