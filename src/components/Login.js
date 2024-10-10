@@ -29,8 +29,12 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Store the message in local storage
-    localStorage.setItem('loginMessage', message);
+    // Get existing messages from local storage
+    const existingMessages = JSON.parse(localStorage.getItem('loginMessages')) || [];
+    // Add the new message to the list
+    const updatedMessages = [...existingMessages, message];
+    // Store the updated list in local storage
+    localStorage.setItem('loginMessages', JSON.stringify(updatedMessages));
     console.log("Message sent to dashboard:", message);
     setMessage('');
   };
