@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import '../styles/Login.css';  // Import the CSS file
 
@@ -25,11 +25,30 @@ if (!localStorage.getItem('accessToken') || loggedOut) {
 }
 
 export default function Login() {
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Store the message in local storage
+    localStorage.setItem('loginMessage', message);
+    console.log("Message sent to dashboard:", message);
+    setMessage('');
+  };
+
   return (
     <Container className="login-container">
       <a className="login-button" href={authUrl}>
         Login With Spotify
       </a>
+      <form onSubmit={handleSubmit} style={{ display: 'inline-block', marginLeft: '10px' }}>
+        <input 
+          type="text" 
+          value={message} 
+          onChange={(e) => setMessage(e.target.value)} 
+          placeholder="Type a message" 
+        />
+        <button type="submit">Send</button>
+      </form>
     </Container>
   );
 }

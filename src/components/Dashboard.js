@@ -9,6 +9,7 @@ import CreatePlaylist from './CreatePlaylist';
 import DisplayPlaylists from './DisplayPlaylists';
 import '../styles/Dashboard.css';
 import { ResizableBox } from 'react-resizable';
+import { FaEnvelope } from 'react-icons/fa'; // Import the icon
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "69fd466f76c84dc9b965ac235c3c97b7",
@@ -27,6 +28,9 @@ export default function Dashboard({ code }) {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
+
+  const [showMessageBox, setShowMessageBox] = useState(false); // State to manage message box visibility
+  const [message, setMessage] = useState(''); // State to manage the message input
 
   const handleLogout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");
@@ -160,14 +164,32 @@ export default function Dashboard({ code }) {
     return () => (cancel = true);
   }, [search, accessToken]);
 
+  useEffect(() => {
+    // Read the message from local storage
+    const storedMessage = localStorage.getItem('loginMessage');
+    if (storedMessage) {
+      setMessage(storedMessage);
+    }
+  }, []);
+
   return (
     <Container className="dashboard-container d-flex flex-column py-2">
       <Navbar bg="dark" variant="dark" className="mb-4">
         <Navbar.Brand href="#home">Spotify Scheduler</Navbar.Brand>
         <Nav className="ms-auto">
           <Button onClick={handleLogout} variant="outline-light">Logout</Button>
+          <FaEnvelope 
+            onClick={() => setShowMessageBox(!showMessageBox)} 
+            style={{ cursor: 'pointer', marginLeft: '10px', color: 'white' }} 
+          />
         </Nav>
       </Navbar>
+
+      {showMessageBox && (
+        <div style={{ marginBottom: '10px' }}>
+          <p>{message}</p>
+        </div>
+      )}
 
       <CreatePlaylist spotifyApi={spotifyApi} refreshPlaylists={refreshPlaylists} />
 
