@@ -1,20 +1,88 @@
-/* Login.css */
 .login-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .login-button {
-    background-color: green;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    font-size: 1.25rem;
-    text-decoration: none;
-    border-radius: 5px;
-  }
-  
-  .login-button:hover {
-    background-color: darkgreen;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #1B1A1C; /* Background color */
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+.logo-container {
+  width: 200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.spotify-logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 30px;
+}
+
+.app-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 50px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.button {
+  padding: 12px 20px;
+  font-size: 1.2rem;
+  color: white;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.login-button {
+  background-color: #1DB954; /* Spotify green */
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  text-decoration: none;
+  padding: 12px 20px;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.login-button:hover {
+  background-color: #1ed760; /* Lighter green on hover */
+}
+
+input[type="text"] {
+  padding: 10px;
+  border-radius: 30px;
+  border: 2px solid white;
+  background-color: transparent;
+  color: white;
+  margin-right: 10px;
+}
+
+button[type="submit"] {
+  background-color: #3D3C3C;
+  border-radius: 30px;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #1ed760;
+}

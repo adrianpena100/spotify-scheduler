@@ -41,7 +41,12 @@ export default function Login() {
 
   return (
     <Container className="login-container">
-      <a className="login-button" href={authUrl}>
+      <div className="logo-container">
+        <img src={`${process.env.PUBLIC_URL}/assets/Primary_Logo_White_RGB.svg`} alt="Spotify Logo" className="spotify-logo" />
+      </div>
+      <h1 className="app-name">Spotify Live DJ</h1>
+      <div classNme="button-container">
+        <a className="button login-button" href={authUrl}>
         Login With Spotify
       </a>
       <form onSubmit={handleSubmit} style={{ display: 'inline-block', marginLeft: '10px' }}>
@@ -51,8 +56,9 @@ export default function Login() {
           onChange={(e) => setMessage(e.target.value)} 
           placeholder="Type a message" 
         />
-        <button type="submit">Send</button>
+        <button type="submit" className="button">Send</button>
       </form>
+      </div>
     </Container>
   );
 }
