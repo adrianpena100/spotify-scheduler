@@ -223,32 +223,36 @@ export default function Dashboard({ code }) {
             className="search-control"
           />
 
-          <div className="search-results">
-            {searchResults.map(track => (
-              <TrackSearchResult
-                track={track}
-                key={track.uri}
-                chooseTrack={chooseTrack}
-                partyPlaylists={partyPlaylists}
-                spotifyApi={spotifyApi}
-                refreshPlaylists={refreshPlaylists}
-                refreshTracks={refreshTracks}
-                selectedPlaylistId={selectedPlaylistId}
-              />
-            ))}
-            {searchResults.length === 0 && <div className="no-lyrics centered-text">{lyrics}</div>}
-          </div>
+<div className="search-results-container">
+    <div className="search-results">
+      {searchResults.map(track => (
+        <TrackSearchResult
+          track={track}
+          key={track.uri}
+          chooseTrack={chooseTrack}
+          partyPlaylists={partyPlaylists}
+          spotifyApi={spotifyApi}
+          refreshPlaylists={refreshPlaylists}
+          refreshTracks={refreshTracks}
+          selectedPlaylistId={selectedPlaylistId}
+        />
+      ))}
+      {searchResults.length === 0 && <div className="no-lyrics centered-text">{lyrics}</div>}
+    </div>
+  </div>
         </>
       </ResizableBox>
 
-      <Player 
-        accessToken={accessToken}
-        trackUri={playingTrack?.uri}
-        onNextTrack={handleNextTrack}
-        onPreviousTrack={handlePreviousTrack}
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-      />
+      <div className="player-wrapper">
+    <Player 
+      accessToken={accessToken}
+      trackUri={playingTrack?.uri}
+      onNextTrack={handleNextTrack}
+      onPreviousTrack={handlePreviousTrack}
+      isPlaying={isPlaying}
+      setIsPlaying={setIsPlaying}
+    />
+  </div>
     </Container>
   );
 }
