@@ -11,3 +11,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace; /* Set a stack of monospaced fonts for code elements */
 }
+
+/* index.css or App.css */
+body, html {
+  background-color: #121212; /* Set to your preferred black color */
+  color: #ffffff; /* Optional: Set text color to white for better contrast */
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif; /* Adjust font as needed */
+}
+
+.dashboard-container {
+  background-color: #121212; /* Ensures main container also has a black background */
+}
+

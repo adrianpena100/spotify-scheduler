@@ -85,3 +85,31 @@
   background-color: #ffffff; /* Button turns white on hover */
   color: #1db954; /* Text turns green on hover */
 }
+
+/* CSS for the scrollable search results container */
+.search-results-container {
+  overflow-y: auto;
+  padding-bottom: 80px; /* Extra padding to ensure visibility above the player */
+  margin-bottom: 80px; /* Space between the scrollable container and the player */
+  max-height: calc(100vh - 220px); /* Adjust based on your layout */
+}
+
+/* Sticky player styling */
+.player-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #282828;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust padding for the main container to avoid overlap with the player */
+.dashboard-container {
+  padding-bottom: 100px; /* Ensures enough space above the player */
+}
+
+
+

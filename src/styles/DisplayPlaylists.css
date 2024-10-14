@@ -80,6 +80,7 @@
 .remove-icon {
     cursor: pointer;
     color: red;
+    margin-right: 20px;
 }
 
 .remove-icon:hover {
